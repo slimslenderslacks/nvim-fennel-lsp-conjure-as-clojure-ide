@@ -4,3 +4,5 @@
 (set nvim.g.conjure#mapping#doc_word "K")
 (set nvim.g.conjure#client#clojure#nrepl#eval#auto_require false)
 (set nvim.g.conjure#client#clojure#nrepl#connection#auto_repl#enabled false)
+(set nvim.g.conjure#client#clojure#nrepl#eval#raw_out true)
+(set nvim.g.conjure#log#wrap true)

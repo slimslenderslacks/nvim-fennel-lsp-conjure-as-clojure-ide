@@ -49,10 +49,20 @@
   :Olical/conjure {:branch :master :mod :conjure}
 
   ;; sexp
-  :guns/vim-sexp {:mod :sexp}
-  :tpope/vim-sexp-mappings-for-regular-people {}
-  :tpope/vim-repeat {}
-  :tpope/vim-surround {}
+;;  :guns/vim-sexp {:mod :sexp}
+;;  :tpope/vim-sexp-mappings-for-regular-people {}
+;;  :tpope/vim-repeat {}
+;;  :tpope/vim-surround {}
+  :vim-scripts/paredit.vim {}
+
+  ;; comments
+  :preservim/nerdcommenter {}
+
+  ;; nerdtree
+  :preservim/nerdtree {}
+  
+  ;; git
+  :tpope/vim-fugitive {}
 
   ;; parsing system
   :nvim-treesitter/nvim-treesitter {:run ":TSUpdate"
