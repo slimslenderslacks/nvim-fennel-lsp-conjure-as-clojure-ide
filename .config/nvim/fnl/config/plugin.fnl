@@ -25,7 +25,6 @@
 
 ;;; plugins managed by packer
 ;;; :mod specifies namespace under plugin directory
-
 (use
   ;; plugin Manager
   :wbthomason/packer.nvim {}
@@ -79,4 +78,5 @@
                                 :hrsh7th/cmp-nvim-lsp
                                 :hrsh7th/cmp-vsnip
                                 :PaterJason/cmp-conjure]
-                     :mod :cmp})
+                     :mod :cmp}
+  )

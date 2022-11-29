@@ -20,6 +20,8 @@
   (define-signs "Diagnostic")
   (define-signs "LspDiagnostics"))
 
+;(nvim.command "au BufNewFile,BufRead */datalog/*/*.edn set filetype=datalog")
+
 ;server features
 (let [handlers {"textDocument/publishDiagnostics"
                 (vim.lsp.with

@@ -18,7 +18,20 @@
 (nvim.set_keymap :t :<ESC> "<c-\\><c-n>" {:noremap true})
 (set nvim.g.mapleader ",")
 (set nvim.g.maplocalleader ",")
+
+; terminal
 (nvim.set_keymap :n :<leader>term ":sp<CR>:term<CR>a" {:noremap true})
+
+; in terminal mode c-\ c-n is Esc
+(nvim.set_keymap :n :<leader>clj ":vs<CR>:term<CR>:file clj-repl<CR>aclj -A:test:cider-clj<CR><c-\\><c-n>" {:noremap true})
+(nvim.set_keymap :n :<leader>bclj ":vs<CR>:buffer clj-repl<CR>" {:noremap true})
+; back and forth in buffers
+(nvim.set_keymap :n :<leader><tab> ":bnext<CR>" {:noremap true})
+(nvim.set_keymap :n "<leader>`" ":bprev<CR>" {:noremap true})
+; quit without losing windows
+(nvim.set_keymap :n :<leader>q ":bp<bar>sp<bar>bn<bar>bd<CR>" {})
+; close window
+(nvim.set_keymap :n "<leader>wc" "<c-w>c<CR>" {:noremap true})
 
 ;don't wrap lines
 (nvim.ex.set :nowrap)
