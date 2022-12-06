@@ -2,7 +2,9 @@
   {autoload {nvim aniseed.nvim
              custom config.custom
              lsp lspconfig
-             cmplsp cmp_nvim_lsp}})
+             cmplsp cmp_nvim_lsp
+             os os}})
+
 
 ;symbols to show for lsp diagnostics
 (defn define-signs
@@ -88,7 +90,12 @@
                           :capabilities capabilities})
 
   ;; docker-lsp
-  (lsp.docker_lsp.setup {:cmd ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
+  ;; ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
+  ;; ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "atomist/lsp"]
+  (lsp.docker_lsp.setup {:cmd 
+                         (if (not (os.getenv "USE_DOCKER"))
+                           ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
+                           ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "-v" "/Users/slim:/Users/slim" "-p" "1667:1667" "atomist/lsp"])
                          :on_attach on_attach
                          :handlers handlers
                          :capabilities capabilities})
@@ -100,4 +107,4 @@
                     :capabilities capabilities})
   )
 
-
+(not true)
