@@ -55,7 +55,7 @@
                     (nvim.buf_set_keymap bufnr :n :<leader>ln "<cmd>lua vim.lsp.buf.rename()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>le "<cmd>lua vim.diagnostic.open_float()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>ll "<cmd>lua vim.diagnostic.setloclist()<CR>" {:noremap true})
-                    (nvim.buf_set_keymap bufnr :n :<leader>lf "<cmd>lua vim.lsp.buf.formatting()<CR>" {:noremap true})
+                    (nvim.buf_set_keymap bufnr :n :<leader>lf "<cmd>lua vim.lsp.buf.format()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lj "<cmd>lua vim.diagnostic.goto_next()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lk "<cmd>lua vim.diagnostic.goto_prev()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>la "<cmd>lua vim.lsp.buf.code_action()<CR>" {:noremap true})
@@ -66,7 +66,7 @@
                     (nvim.buf_set_keymap bufnr :n :<leader>lw ":lua require('telescope.builtin').diagnostics()<cr>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lr ":lua require('telescope.builtin').lsp_references()<cr>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>li ":lua require('telescope.builtin').lsp_implementations()<cr>" {:noremap true})
-                    (nvim.buf_set_keymap bufnr :n :<leader>lz ":lua clients = vim.lsp.get_active_clients() for k, client_data in ipairs(clients) do id = client_data.id end client = vim.lsp.get_client_by_id(id) result = client.request_sync(\"clojure/serverInfo/raw\", {}, 5000, 15) print('port = ' .. result.result.port) print('log-path = ' .. result.result['log-path'])<cr>" {:noremap true})
+                    (nvim.buf_set_keymap bufnr :n :<leader>lz ":lua clients = vim.lsp.get_active_clients() for k, client_data in ipairs(clients) do id = client_data.id end client = vim.lsp.get_client_by_id(id) result = client.request_sync(\"clojure/serverInfo/raw\", {}, 5000, 15) print('port = ' .. result.result.port) print('log-path = ' .. result.result['log-path']) print('team-id = ' .. result.result['team-id'])<cr>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lx ":lua require('config.custom').tail_server_info()<cr>" {:noremap true})
                     ))]
 
