@@ -24,6 +24,7 @@
 
 ; in terminal mode c-\ c-n is Esc
 (nvim.set_keymap :n :<leader>clj ":vs<CR>:term<CR>:file clj-repl<CR>aclj -A:test:cider-clj<CR><c-\\><c-n>" {:noremap true})
+(nvim.set_keymap :n :<leader>cljc ":ConjureConnect<CR>" {:noremap true})
 (nvim.set_keymap :n :<leader>bclj ":vs<CR>:buffer clj-repl<CR>" {:noremap true})
 ; back and forth in buffers
 (nvim.set_keymap :n :<leader><tab> ":bnext<CR>" {:noremap true})

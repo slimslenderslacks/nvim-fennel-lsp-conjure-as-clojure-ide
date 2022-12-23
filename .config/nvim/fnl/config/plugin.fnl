@@ -68,7 +68,7 @@
                                     :mod :treesitter}
 
   ;; lsp
-  :neovim/nvim-lspconfig {:mod :lspconfig}
+  :slimslenderslacks/nvim-lspconfig {:mod :lspconfig}
 
   ; snippets
   :L3MON4D3/LuaSnip {:requires [:saadparwaiz1/cmp_luasnip]}
@@ -79,4 +79,8 @@
                                 :hrsh7th/cmp-vsnip
                                 :PaterJason/cmp-conjure]
                      :mod :cmp}
+
+  :junegunn/goyo.vim {}
+  :itspriddle/vim-marked {}
+  :gabrielelana/vim-markdown {}
   )
