@@ -1,5 +1,5 @@
 (module config.plugin.cmp
-  {autoload {nvim aniseed.nvim
+  {autoload {nvim aniseed.nvim 
              cmp cmp
              luasnip luasnip}})
 
@@ -13,7 +13,7 @@
 (def- cmp-srcs
   [{:name :nvim_lsp}
    {:name :conjure}
-   {:name :buffer}
+   ;;{:name :buffer}
    {:name :vsnip}
    {:name :luasnip}])
 

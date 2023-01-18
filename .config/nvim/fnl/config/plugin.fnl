@@ -83,4 +83,5 @@
   :junegunn/goyo.vim {}
   :itspriddle/vim-marked {}
   :gabrielelana/vim-markdown {}
+  :github/copilot.vim {}
   )
