@@ -1,10 +1,9 @@
 (module config.plugin.lspconfig
-  {autoload {nvim aniseed.nvim
-             custom config.custom
+  {require {custom config.custom}
+   autoload {nvim aniseed.nvim
              lsp lspconfig
              cmplsp cmp_nvim_lsp
              os os}})
-
 
 ;symbols to show for lsp diagnostics
 (defn define-signs
@@ -60,13 +59,15 @@
                     (nvim.buf_set_keymap bufnr :n :<leader>lk "<cmd>lua vim.diagnostic.goto_prev()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>la "<cmd>lua vim.lsp.buf.code_action()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :v :<leader>la "<cmd>lua vim.lsp.buf.range_code_action()<CR> " {:noremap true})
+                    (nvim.buf_set_keymap bufnr :n "<cmd>." "<cmd>lua vim.lsp.buf.range_code_action()<CR> " {:noremap true})
+                    (nvim.buf_set_keymap bufnr :n :<alt>. "<cmd>lua vim.lsp.buf.range_code_action()<CR> " {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lcld "<cmd>lua vim.lsp.codelens.refresh()<CR>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lclr "<cmd>lua vim.lsp.codelens.run()<CR>" {:noremap true})
                     ;telescope
                     (nvim.buf_set_keymap bufnr :n :<leader>lw ":lua require('telescope.builtin').diagnostics()<cr>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>lr ":lua require('telescope.builtin').lsp_references()<cr>" {:noremap true})
                     (nvim.buf_set_keymap bufnr :n :<leader>li ":lua require('telescope.builtin').lsp_implementations()<cr>" {:noremap true})
-                    (nvim.buf_set_keymap bufnr :n :<leader>lz ":lua clients = vim.lsp.get_active_clients() for k, client_data in ipairs(clients) do id = client_data.id end client = vim.lsp.get_client_by_id(id) result = client.request_sync(\"clojure/serverInfo/raw\", {}, 5000, 15) print('port = ' .. result.result.port) print('log-path = ' .. result.result['log-path']) print('team-id = ' .. result.result['team-id'])<cr>" {:noremap true})
+                    ;; start tailing lsp log
                     (nvim.buf_set_keymap bufnr :n :<leader>lx ":lua require('config.custom').tail_server_info()<cr>" {:noremap true})
                     ))]
 
@@ -94,8 +95,28 @@
   ;; ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "atomist/lsp"]
   (lsp.docker_lsp.setup {:cmd 
                          (if (not (os.getenv "USE_DOCKER"))
-                           ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar" "--pod-exe-path" "/Users/slim/.babashka/pods/repository/atomisthq/tools.docker/0.1.0/go.sh"]
-                           ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "-v" "/Users/slim:/Users/slim" "-p" "1667:1667" "atomist/lsp"])
+                           (if (not (os.getenv "DOCKER_LSP_NATIVE"))
+                             ["java" 
+                              "--add-opens=java.base/java.nio=ALL-UNNAMED" 
+                              "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED" 
+                              "-jar" "/Users/slim/atmhq/lsp/docker-lsp-standalone.jar" 
+                              "--pod-exe-path" "/Users/slim/.babashka/pods/repository/atomisthq/tools.docker/0.1.0/pod-atomisthq-tools.docker"
+                              "--user" "jimclark106"
+                              "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"]
+                             ["/Users/slim/atmhq/lsp/docker-lsp"
+                              "--pod-exe-path" "/Users/slim/.babashka/pods/repository/atomisthq/tools.docker/0.1.0/pod-atomisthq-tools.docker"
+                              "--extension" "/Users/slim/atmhq/lsp/resources" 
+                              "--user" "jimclark106"
+                              "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"])
+                           ["docker" "run" 
+                                     "--rm" "--init" "-i" 
+                                     "-v" "/tmp:/tmp" 
+                                     "-v" "/Users/slim:/Users/slim" 
+                                     "-p" "1667:1667" 
+                                     "atomist/lsp" 
+                                     "--user" "jimclark106" 
+                                     "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo" 
+                                     "--workspace" "/Users/slim"])
                          :on_attach on_attach
                          :handlers handlers
                          :capabilities capabilities})

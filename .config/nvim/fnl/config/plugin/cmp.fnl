@@ -12,6 +12,7 @@
 
 (def- cmp-srcs
   [{:name :nvim_lsp}
+   ;; maybe able to use trigger_characters here to over-ride
    {:name :conjure}
    ;;{:name :buffer}
    {:name :vsnip}
