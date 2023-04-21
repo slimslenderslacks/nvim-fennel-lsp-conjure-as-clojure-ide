@@ -33,9 +33,20 @@
 ; Buffers and Tabs
 (nvim.set_keymap :n :<TAB> ":bn<CR>" {})
 (nvim.set_keymap :n :<S-TAB> ":bp<CR>" {})
+(nvim.set_keymap :n :<Right> ":bn<CR>" {})
+(nvim.set_keymap :n :<Left> ":bp<CR>" {})
+(nvim.set_keymap :n :<leader>lpv ":Goyo<CR>:lua require('lualine').hide()<CR>:set conceallevel=2<CR>" {})
+(nvim.set_keymap :n :<leader>lpq ":Goyo!<CR>:lua require('lualine').hide({unhide=true})<CR>:set conceallevel=0<CR>" {})
+
 (nvim.set_keymap :n :<leader>bd ":bd<CR>" {})
 ; close window
 (nvim.set_keymap :n "<leader>wc" "<c-w>c<CR>" {:noremap true})
+
+; asciiart - lightning talk
+(nvim.set_keymap :n "<leader>at" ":.!figlet -w 200 -f standard<CR>" {})
+(nvim.set_keymap :n "<leader>ats" ":.!figlet -w 200 -f small<CR>" {})
+(nvim.set_keymap :n "<leader>ab" ":.!toilet -w 200 -f term -F border<CR>" {})
+(nvim.set_keymap :n "<leader>ldv" ":vs<CR>:e ~/myquery<CR><ctrl-w><shift-h>" {})
 
 ; TERMINAL
 ;; so that terminal mode can use esc

@@ -90,6 +90,11 @@
                           :handlers handlers
                           :capabilities capabilities})
 
+  ;; Nix
+  (lsp.rnix.setup {:on_attach on_attach
+                   :handlers handlers
+                   :capabilities capabilities})
+
   ;; docker-lsp
   ;; ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
   ;; ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "atomist/lsp"]
@@ -99,15 +104,12 @@
                              ["java" 
                               "--add-opens=java.base/java.nio=ALL-UNNAMED" 
                               "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED" 
-                              "-jar" "/Users/slim/atmhq/lsp/docker-lsp-standalone.jar" 
-                              "--pod-exe-path" "/Users/slim/.babashka/pods/repository/atomisthq/tools.docker/0.1.0/pod-atomisthq-tools.docker"
-                              "--user" "jimclark106"
-                              "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"]
-                             ["/Users/slim/atmhq/lsp/docker-lsp"
-                              "--pod-exe-path" "/Users/slim/.babashka/pods/repository/atomisthq/tools.docker/0.1.0/pod-atomisthq-tools.docker"
-                              "--extension" "/Users/slim/atmhq/lsp/resources" 
-                              "--user" "jimclark106"
-                              "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"])
+                              "-jar" "/Users/slim/docker/lsp/docker-lsp-standalone.jar" 
+                              "--user" "jimclark106"]
+                             ["docker"
+                              "lsp"
+                              "listen"
+                              "--user" "jimclark106"])
                            ["docker" "run" 
                                      "--rm" "--init" "-i" 
                                      "-v" "/tmp:/tmp" 

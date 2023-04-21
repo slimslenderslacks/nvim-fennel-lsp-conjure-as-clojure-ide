@@ -32,7 +32,8 @@
   :Olical/aniseed {:branch :develop}
 
   ;; theme
-  :projekt0n/github-nvim-theme {:mod :theme}
+  :projekt0n/github-nvim-theme {:mod :theme
+                                :tag "v0.0.7"}
   :kyazdani42/nvim-web-devicons {}
 
   ;; status line
@@ -82,6 +83,6 @@
 
   :junegunn/goyo.vim {}
   :itspriddle/vim-marked {}
-  :gabrielelana/vim-markdown {}
+  :preservim/vim-markdown {:mod :vim-markdown}
   :github/copilot.vim {}
   )
