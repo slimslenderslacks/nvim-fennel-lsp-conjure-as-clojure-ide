@@ -99,13 +99,14 @@
   ;; docker-lsp
   ;; ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
   ;; ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "atomist/lsp"]
-  (lsp.docker_lsp.setup {:cmd 
+  (lsp.docker_lsp.setup {:cmd
                          (if (not (os.getenv "USE_DOCKER"))
                            (if (not (os.getenv "DOCKER_LSP_NATIVE"))
                              ["java" 
                               "--add-opens=java.base/java.nio=ALL-UNNAMED" 
                               "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED" 
                               "-jar" "/Users/slim/docker/lsp/docker-lsp-standalone.jar" 
+                              "--pod-exe-path" "/Users/slim/docker/babashka-pod-docker/result/bin/babashka-pod-docker"
                               "--user" "jimclark106"]
                              ["docker"
                               "lsp"
