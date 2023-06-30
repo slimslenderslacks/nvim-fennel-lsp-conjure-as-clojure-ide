@@ -102,24 +102,24 @@
   (lsp.docker_lsp.setup {:cmd
                          (if (not (os.getenv "USE_DOCKER"))
                            (if (not (os.getenv "DOCKER_LSP_NATIVE"))
-                             ["java" 
-                              "--add-opens=java.base/java.nio=ALL-UNNAMED" 
-                              "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED" 
-                              "-jar" "/Users/slim/docker/lsp/docker-lsp-standalone.jar" 
-                              "--pod-exe-path" "/Users/slim/docker/babashka-pod-docker/result/bin/babashka-pod-docker"
+                             ["nix"
+                              "run"
+                              "/Users/slim/docker/lsp/#clj"
+                              "--"
+                              "--pod-exe-path" "/Users/slim/.docker/cli-plugins/docker-pod"
                               "--user" "jimclark106"]
                              ["docker"
                               "lsp"
                               "listen"
                               "--user" "jimclark106"])
-                           ["docker" "run" 
-                                     "--rm" "--init" "-i" 
-                                     "-v" "/tmp:/tmp" 
-                                     "-v" "/Users/slim:/Users/slim" 
-                                     "-p" "1667:1667" 
-                                     "atomist/lsp" 
-                                     "--user" "jimclark106" 
-                                     "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo" 
+                           ["docker" "run"
+                                     "--rm" "--init" "-i"
+                                     "-v" "/tmp:/tmp"
+                                     "-v" "/Users/slim:/Users/slim"
+                                     "-p" "1667:1667"
+                                     "atomist/lsp"
+                                     "--user" "jimclark106"
+                                     "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"
                                      "--workspace" "/Users/slim"])
                          :on_attach on_attach
                          :handlers handlers

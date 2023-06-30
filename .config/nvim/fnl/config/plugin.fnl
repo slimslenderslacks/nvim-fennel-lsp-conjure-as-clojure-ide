@@ -34,10 +34,10 @@
   ;; theme
   :projekt0n/github-nvim-theme {:mod :theme
                                 :tag "v0.0.7"}
-  :kyazdani42/nvim-web-devicons {}
+  ;; :kyazdani42/nvim-web-devicons {}
 
   ;; status line
-  :nvim-lualine/lualine.nvim {:mod :lualine}
+  ;; :nvim-lualine/lualine.nvim {:mod :lualine}
 
   ;; file searching
   :nvim-telescope/telescope.nvim {:requires [:nvim-telescope/telescope-ui-select.nvim
@@ -59,14 +59,14 @@
   :preservim/nerdcommenter {}
 
   ;; nerdtree
-  :preservim/nerdtree {}
-  
+  ;; :preservim/nerdtree {}
+
   ;; git
-  :tpope/vim-fugitive {}
+  ;; :tpope/vim-fugitive {}
 
   ;; parsing system
-  :nvim-treesitter/nvim-treesitter {:run ":TSUpdate"
-                                    :mod :treesitter}
+  ;; :nvim-treesitter/nvim-treesitter {:run ":TSUpdate"
+  ;;                                   :mod :treesitter}
 
   ;; lsp
   :slimslenderslacks/nvim-lspconfig {:mod :lspconfig}
@@ -84,5 +84,5 @@
   :junegunn/goyo.vim {}
   :itspriddle/vim-marked {}
   :preservim/vim-markdown {:mod :vim-markdown}
-  :github/copilot.vim {}
+  ;; :github/copilot.vim {}
   )
