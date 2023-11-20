@@ -113,11 +113,10 @@
                               "listen"
                               "--user" "jimclark106"])
                            ["docker" "run"
-                                     "--rm" "--init" "-i"
+                                     "--rm" "--init" "--interactive"
                                      "-v" "/tmp:/tmp"
                                      "-v" "/Users/slim:/Users/slim"
-                                     "-p" "1667:1667"
-                                     "atomist/lsp"
+                                     "vonwig/lsp"
                                      "--user" "jimclark106"
                                      "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"
                                      "--workspace" "/Users/slim"])

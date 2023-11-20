@@ -58,12 +58,6 @@
   ;; comments
   :preservim/nerdcommenter {}
 
-  ;; nerdtree
-  ;; :preservim/nerdtree {}
-
-  ;; git
-  ;; :tpope/vim-fugitive {}
-
   ;; parsing system
   ;; :nvim-treesitter/nvim-treesitter {:run ":TSUpdate"
   ;;                                   :mod :treesitter}
