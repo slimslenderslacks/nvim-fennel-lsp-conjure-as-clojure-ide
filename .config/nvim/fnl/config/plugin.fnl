@@ -34,10 +34,6 @@
   ;; theme
   :projekt0n/github-nvim-theme {:mod :theme
                                 :tag "v0.0.7"}
-  ;; :kyazdani42/nvim-web-devicons {}
-
-  ;; status line
-  ;; :nvim-lualine/lualine.nvim {:mod :lualine}
 
   ;; file searching
   :nvim-telescope/telescope.nvim {:requires [:nvim-telescope/telescope-ui-select.nvim
@@ -47,20 +43,6 @@
 
   ;; repl tools
   :Olical/conjure {:branch :master :mod :conjure}
-
-  ;; sexp
-;;  :guns/vim-sexp {:mod :sexp}
-;;  :tpope/vim-sexp-mappings-for-regular-people {}
-;;  :tpope/vim-repeat {}
-;;  :tpope/vim-surround {}
-  :vim-scripts/paredit.vim {}
-
-  ;; comments
-  :preservim/nerdcommenter {}
-
-  ;; parsing system
-  ;; :nvim-treesitter/nvim-treesitter {:run ":TSUpdate"
-  ;;                                   :mod :treesitter}
 
   ;; lsp
   :slimslenderslacks/nvim-lspconfig {:mod :lspconfig}
@@ -75,8 +57,6 @@
                                 :PaterJason/cmp-conjure]
                      :mod :cmp}
 
-  :junegunn/goyo.vim {}
   :itspriddle/vim-marked {}
   :preservim/vim-markdown {:mod :vim-markdown}
-  ;; :github/copilot.vim {}
   )
