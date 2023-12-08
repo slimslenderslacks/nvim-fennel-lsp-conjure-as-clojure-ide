@@ -14,6 +14,7 @@
    :col 3 
    :width 80 
    :height 40 
+   :style "minimal"
    :border "rounded" 
    :title "my title"
    :title_pos "center"})
