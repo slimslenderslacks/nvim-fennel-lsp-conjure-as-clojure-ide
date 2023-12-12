@@ -61,3 +61,15 @@
 
 ;; I need a function that adds strings in python
 ;; My Docker Image should package a Node app based on a package.json file
+
+(defn options [cb]
+  (let [prompts ["Ask_about_code" "Ask_about_documentation" "Explain_some_code" "Generate_some_code"]]
+    (vim.ui.select 
+      prompts 
+      {:prompt "Select a prompt:"
+       :format (fn [item] (item:gsub "_" " "))}
+      (fn [selected _] (when selected (cb selected))))))
+
+(comment
+  (options (fn [selected] (core.println selected))))
+

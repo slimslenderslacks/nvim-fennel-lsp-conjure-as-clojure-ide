@@ -82,3 +82,4 @@
 
 ;import plugin.fnl
 (require :config.plugin)
+(require :snippets)
