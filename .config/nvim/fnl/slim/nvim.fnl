@@ -38,6 +38,14 @@
                            (set current-char (+ (% current-char (core.count characters)) 1))))))
     t))
 
+(defn uuid []
+  (let [p (vim.system 
+            ["uuidgen"] 
+            {:text true})
+        obj (p:wait)]
+    (core.println obj)
+    (str.trim (. obj :stdout))))
+
 (comment
   (let [buf (nvim.create_buf false true)]
     (open-win buf {:title "hey"})

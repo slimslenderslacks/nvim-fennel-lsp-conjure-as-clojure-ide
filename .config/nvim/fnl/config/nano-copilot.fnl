@@ -3,7 +3,8 @@
              nvim aniseed.nvim
              str aniseed.string
              util slim.nvim
-             curl plenary.curl}})
+             curl plenary.curl
+             dockerai dockerai}})
 
 (defn open [lines]
   (let [buf (nvim.create_buf false true)]
@@ -70,6 +71,36 @@
        :format (fn [item] (item:gsub "_" " "))}
       (fn [selected _] (when selected (cb selected))))))
 
+(defn execute-docker-ai-prompt [prompt]
+  (let [lines (str.split prompt "\n")
+        buf (open lines)]
+    ;; run the LLM
+    (let [t (util.show-spinner buf (core.inc (core.count lines))) ]
+      (nvim.buf_set_lines buf -1 -1 false ["" ""])
+      (dockerai.docker-ai-prompt 
+        (util.uuid) 
+        {:content (fn [_ message]
+                    (t:stop)
+                    (dockerai.update-buf buf [(vim.json.encode message)]))
+         :error (fn [_ message] (core.println message))
+         :exit (fn [id message] (core.println "finished" id))}        
+        prompt))))
+
+;; Now integrate Docker AI
+(defn dockerCopilot []
+  (let [prompts (dockerai.docker-ai-questions)]
+    (vim.ui.select
+      prompts
+      {:prompt "Select a prompt:"
+       :format (fn [item] (item:gsub "_" " "))}
+      (fn [selected _]
+        (execute-docker-ai-prompt selected)))))
+
+(nvim.set_keymap :n :<leader>dai ":lua require('config.nano-copilot').dockerCopilot()<CR>" {})
+
 (comment
+  (dockerai.start-docker-ai)
+  (core.map (fn [client] (. client :name)) (vim.lsp.get_active_clients))
+  (dockerai.stop-docker-ai)
   (options (fn [selected] (core.println selected))))
 

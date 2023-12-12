@@ -8,7 +8,8 @@
                          "          nvim aniseed.nvim"
                          "          str aniseed.string"
                          "          util slim.nvim"
-                         "          curl plenary.curl}"])])
+                         "          curl plenary.curl}"
+                         "          dockerai dockerai"])])
          (ls.snippet "keymap"
                      [(ls.text_node
-                        "(nvim.set_keymap :v :<leader>ai \":lua require('config.nano-copilot').openselection()<CR>\")")])])
+                        "(nvim.set_keymap :v :<leader>ai \":lua require('config.nano-copilot').openselection()<CR>\") {}")])])

@@ -124,6 +124,17 @@
                       :dataTrackTimestamp 0}))] 
       (core.println result))))
 
+(defn docker-ai-questions []
+  (let [docker-ai-lsp (get-client-by-name "docker-ai")
+        docker-lsp (get-client-by-name "docker-lsp")]
+    (let [result (. (docker-lsp.request_sync "docker/project-facts" {"vs-machine-id" ""} 60000) :result)]
+      (core.concat
+        (. result :project/potential-questions)
+        ["Summarize this project" 
+         "Can you write a Dockerfile for this project"
+         "How do I build this Docker project?"
+         "Custom Question"]))))
+
 (defn start-docker-ai []
   (let [cb {:exit (fn [id message]
                     ((. (. registrations id) :exit) id message)
