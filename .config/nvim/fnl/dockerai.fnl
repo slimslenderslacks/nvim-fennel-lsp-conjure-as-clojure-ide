@@ -1,7 +1,8 @@
 (module dockerai
   {autoload {nvim aniseed.nvim
              core aniseed.core
-             string aniseed.string}})
+             string aniseed.string
+             util slim.nvim}})
 
 (vim.lsp.set_log_level "TRACE")
 (def use-nix? true)
@@ -55,7 +56,7 @@
     (core.println "jwt err: " err))
   (jwt))
 
-(defn start [root-dir prompt-handler exit-handler]
+(defn start-lsps [root-dir prompt-handler exit-handler]
   (let [docker-ai-lsp
         (vim.lsp.start_client {:name "docker-ai"
                                :cmd ["docker" "run"
@@ -91,13 +92,13 @@
 (defn get-client-by-name [s]
   (core.some (fn [client] (when (= client.name s) client)) (vim.lsp.get_active_clients)) )
 
-(defn stop-docker-ai []
+(defn stop []
   (vim.lsp.stop_client (. (get-client-by-name "docker-lsp") :id)  false)
   (vim.lsp.stop_client (. (get-client-by-name "docker-ai") :id) false))
 
 (var registrations {})
 
-(defn docker-ai-prompt [question-id callback prompt]
+(defn run-prompt [question-id callback prompt]
   (set registrations (core.assoc registrations question-id callback))
   (let [docker-ai-lsp (get-client-by-name "docker-ai")
         docker-lsp (get-client-by-name "docker-lsp")]
@@ -124,7 +125,7 @@
                       :dataTrackTimestamp 0}))] 
       (core.println result))))
 
-(defn docker-ai-questions []
+(defn questions []
   (let [docker-ai-lsp (get-client-by-name "docker-ai")
         docker-lsp (get-client-by-name "docker-lsp")]
     (let [result (. (docker-lsp.request_sync "docker/project-facts" {"vs-machine-id" ""} 60000) :result)]
@@ -135,7 +136,39 @@
          "How do I build this Docker project?"
          "Custom Question"]))))
 
-(defn start-docker-ai []
+(defn update-buf [buf lines]
+  (vim.api.nvim_buf_call
+    buf
+    (fn [] 
+      (vim.cmd "norm! G")
+      (vim.api.nvim_put lines "" true true))))
+
+(defn prompt [buf t prompt]
+  (run-prompt 
+        (util.uuid) 
+        {:content 
+         (fn [_ message] 
+           (t:stop) 
+           (let [current-lines (vim.api.nvim_buf_get_lines buf 0 -1 true)
+                 lines 
+                 (if 
+                   (. message :content)
+                   (string.split (. message :content) "\n")
+                   (and 
+                     (. message :function_call) 
+                     (= (-> message (. :function_call) (. :name)) "cell-execution"))
+                   (core.concat 
+                     ["" "```bash"] 
+                     (string.split (-> message (. :function_call) (. :arguments) (. :command)) "\n") ["```" ""])  
+                   (. message :complete)
+                   ["----"] 
+                   ["" "```json" (vim.json.encode message) "```" ""])]
+             (vim.api.nvim_buf_set_lines buf (core.count current-lines) -1 false lines)))
+         :error (fn [_ message] (core.println message))
+         :exit (fn [id message] (core.println "finished" id))}        
+        prompt))
+
+(defn start []
   (let [cb {:exit (fn [id message]
                     ((. (. registrations id) :exit) id message)
                     ;; TODO remove the handler
@@ -144,15 +177,10 @@
                      (core.println id message))
             :content (fn [id message]
                        ((. (. registrations id) :content) id message))}]
-    (start 
+    (start-lsps
       (vim.fn.getcwd)
       (prompt-handler cb)
       (exit-handler cb))))
-
-(defn update-buf [buf lines]
-  (vim.api.nvim_buf_call
-    buf
-    (fn [] (vim.api.nvim_put lines "" true true))))
 
 (defn callback [buf]
   {:exit (fn [id message] (update-buf buf [id (vim.json.encode message) "----" ""]))
@@ -162,13 +190,13 @@
 (comment
   (def buf (vim.api.nvim_create_buf true true))
   
-  (start-docker-ai) 
-  (core.map (fn [client] (. client :name)) (vim.lsp.get_active_clients))
-  (stop-docker-ai)
+  (start) 
+  (util.lsps-list)
+  (stop)
 
-  (docker-ai-prompt "18" (callback buf) "Can you write a Dockerfile for this project?")
-  (docker-ai-prompt "19" (callback buf) "Summarize this project")
-  (docker-ai-prompt "21" (callback buf) "How do I dockerize my project")
-  (docker-ai-prompt "22" (callback buf) "How do I build this Docker project?")
+  (run-prompt "18" (callback buf) "Can you write a Dockerfile for this project?")
+  (run-prompt "19" (callback buf) "Summarize this project")
+  (run-prompt "21" (callback buf) "How do I dockerize my project")
+  (run-prompt "22" (callback buf) "How do I build this Docker project?")
   )
 

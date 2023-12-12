@@ -43,8 +43,10 @@
             ["uuidgen"] 
             {:text true})
         obj (p:wait)]
-    (core.println obj)
     (str.trim (. obj :stdout))))
+
+(defn lsps-list []
+  (core.map (fn [client] (. client :name)) (vim.lsp.get_active_clients)))
 
 (comment
   (let [buf (nvim.create_buf false true)]

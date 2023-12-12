@@ -1,4 +1,4 @@
-(module config.nano-copilot
+(module nano-copilot
   {autoload {core aniseed.core
              nvim aniseed.nvim
              str aniseed.string
@@ -9,8 +9,7 @@
 (defn open [lines]
   (let [buf (nvim.create_buf false true)]
     (nvim.buf_set_text buf 0 0 0 0 lines) 
-    (util.open-win buf {:title "Docker Copilot"})
-    buf))
+    [(util.open-win buf {:title "Docker Copilot"}) buf]))
 
 (comment
   (open ["hey"]))
@@ -18,7 +17,7 @@
 (defn openselection []
   (open (util.get-current-buffer-selection)))
 
-(nvim.set_keymap :v :<leader>ai ":lua require('config.nano-copilot').openselection()<CR>" {})
+(nvim.set_keymap :v :<leader>ai ":lua require('nano-copilot').openselection()<CR>" {})
 
 (defn ollama [system-prompt prompt cb]
   (curl.post 
@@ -33,7 +32,7 @@
 (defn execute-prompt [prompt]
   (var tokens [])
   (let [lines (str.split prompt "\n")
-        buf (open lines)]
+        [win buf] (open lines)]
     ;; run the LLM
     (let [t (util.show-spinner buf (core.inc (core.count lines))) ]
       (nvim.buf_set_lines buf -1 -1 false ["" ""])
@@ -63,44 +62,32 @@
 ;; I need a function that adds strings in python
 ;; My Docker Image should package a Node app based on a package.json file
 
-(defn options [cb]
-  (let [prompts ["Ask_about_code" "Ask_about_documentation" "Explain_some_code" "Generate_some_code"]]
-    (vim.ui.select 
-      prompts 
-      {:prompt "Select a prompt:"
-       :format (fn [item] (item:gsub "_" " "))}
-      (fn [selected _] (when selected (cb selected))))))
-
 (defn execute-docker-ai-prompt [prompt]
   (let [lines (str.split prompt "\n")
-        buf (open lines)]
-    ;; run the LLM
+        [win buf] (open lines)]
+    ;; run Docker AI
     (let [t (util.show-spinner buf (core.inc (core.count lines))) ]
       (nvim.buf_set_lines buf -1 -1 false ["" ""])
-      (dockerai.docker-ai-prompt 
-        (util.uuid) 
-        {:content (fn [_ message]
-                    (t:stop)
-                    (dockerai.update-buf buf [(vim.json.encode message)]))
-         :error (fn [_ message] (core.println message))
-         :exit (fn [id message] (core.println "finished" id))}        
-        prompt))))
+      (dockerai.prompt buf t prompt))))
 
 ;; Now integrate Docker AI
 (defn dockerCopilot []
-  (let [prompts (dockerai.docker-ai-questions)]
+  (let [prompts (dockerai.questions)]
     (vim.ui.select
       prompts
       {:prompt "Select a prompt:"
        :format (fn [item] (item:gsub "_" " "))}
       (fn [selected _]
-        (execute-docker-ai-prompt selected)))))
+        (if (= selected "Custom Question")
+          (let [q (vim.fn.input "Custom Question: ")]
+            (execute-docker-ai-prompt q))
+          (execute-docker-ai-prompt selected))))))
 
-(nvim.set_keymap :n :<leader>dai ":lua require('config.nano-copilot').dockerCopilot()<CR>" {})
+(nvim.set_keymap :n :<leader>ai ":lua require('nano-copilot').dockerCopilot()<CR>" {})
 
 (comment
-  (dockerai.start-docker-ai)
-  (core.map (fn [client] (. client :name)) (vim.lsp.get_active_clients))
-  (dockerai.stop-docker-ai)
-  (options (fn [selected] (core.println selected))))
+  (dockerai.start)
+  (util.lsps-list)
+  (dockerai.stop)
+  )
 
