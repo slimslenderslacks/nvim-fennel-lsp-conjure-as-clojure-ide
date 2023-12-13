@@ -7,9 +7,9 @@
              dockerai dockerai}})
 
 (defn open [lines]
-  (let [buf (nvim.create_buf false true)]
+  (let [buf (vim.api.nvim_create_buf false true)]
     (nvim.buf_set_text buf 0 0 0 0 lines) 
-    [(util.open-win buf {:title "Docker Copilot"}) buf]))
+    (util.open-win buf {:title "Copilot"})))
 
 (comment
   (open ["hey"]))
@@ -18,6 +18,8 @@
   (open (util.get-current-buffer-selection)))
 
 (nvim.set_keymap :v :<leader>ai ":lua require('nano-copilot').openselection()<CR>" {})
+
+;;; --------
 
 (defn ollama [system-prompt prompt cb]
   (curl.post 
@@ -30,23 +32,13 @@
                (cb (. (vim.json.decode chunk) "response")))}))
 
 (defn execute-prompt [prompt]
-  (var tokens [])
-  (let [lines (str.split prompt "\n")
-        [win buf] (open lines)]
-    ;; run the LLM
-    (let [t (util.show-spinner buf (core.inc (core.count lines))) ]
-      (nvim.buf_set_lines buf -1 -1 false ["" ""])
-      (ollama "" prompt 
-              (fn [s] 
-                (vim.schedule 
-                  (fn [] 
-                    (t:stop)
-                    (set tokens (core.concat tokens [s]))
-                    (nvim.buf_set_lines buf (core.inc (core.count lines)) -1 false (str.split (str.join tokens) "\n")))))))))
+  (util.stream-into-buffer (partial ollama "") prompt))
 
 (comment
   (execute-prompt "What does a Dockerfile look like?")
   (vim.fn.input "Question: "))
+
+;; ----------
 
 (defn copilot []
   (let [prompt (..
@@ -62,13 +54,12 @@
 ;; I need a function that adds strings in python
 ;; My Docker Image should package a Node app based on a package.json file
 
-(defn execute-docker-ai-prompt [prompt]
-  (let [lines (str.split prompt "\n")
-        [win buf] (open lines)]
-    ;; run Docker AI
-    (let [t (util.show-spinner buf (core.inc (core.count lines))) ]
-      (nvim.buf_set_lines buf -1 -1 false ["" ""])
-      (dockerai.prompt buf t prompt))))
+;; ----------------
+
+(comment
+  (util.lsps-list)
+  (dockerai.start)
+  (dockerai.into-buffer "Summarize this project"))
 
 ;; Now integrate Docker AI
 (defn dockerCopilot []
@@ -80,8 +71,8 @@
       (fn [selected _]
         (if (= selected "Custom Question")
           (let [q (vim.fn.input "Custom Question: ")]
-            (execute-docker-ai-prompt q))
-          (execute-docker-ai-prompt selected))))))
+            (dockerai.into-buffer q))
+          (dockerai.into-buffer selected))))))
 
 (nvim.set_keymap :n :<leader>ai ":lua require('nano-copilot').dockerCopilot()<CR>" {})
 

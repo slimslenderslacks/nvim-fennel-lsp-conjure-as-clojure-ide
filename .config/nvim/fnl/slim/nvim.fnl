@@ -48,6 +48,26 @@
 (defn lsps-list []
   (core.map (fn [client] (. client :name)) (vim.lsp.get_active_clients)))
 
+(defn open [lines]
+  (let [buf (vim.api.nvim_create_buf false true)]
+    (nvim.buf_set_text buf 0 0 0 0 lines) 
+    [(open-win buf {:title "Copilot"}) buf]))
+
+(defn stream-into-buffer [stream-generator prompt]
+  (var tokens [])
+  (let [lines (str.split prompt "\n")
+        [win buf] (open lines)]
+    (let [t (show-spinner buf (core.inc (core.count lines))) ]
+      (nvim.buf_set_lines buf -1 -1 false ["" ""])
+      (stream-generator
+        prompt
+        (fn [s] 
+          (vim.schedule 
+            (fn [] 
+              (t:stop) 
+              (set tokens (core.concat tokens [s])) 
+              (vim.api.nvim_buf_set_lines buf (core.inc (core.count lines)) -1 false (str.split (str.join tokens) "\n")))))))))
+
 (comment
   (let [buf (nvim.create_buf false true)]
     (open-win buf {:title "hey"})

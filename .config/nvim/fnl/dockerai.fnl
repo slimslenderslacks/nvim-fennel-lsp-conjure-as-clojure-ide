@@ -143,30 +143,35 @@
       (vim.cmd "norm! G")
       (vim.api.nvim_put lines "" true true))))
 
-(defn prompt [buf t prompt]
-  (run-prompt 
-        (util.uuid) 
-        {:content 
-         (fn [_ message] 
-           (t:stop) 
-           (let [current-lines (vim.api.nvim_buf_get_lines buf 0 -1 true)
-                 lines 
-                 (if 
-                   (. message :content)
-                   (string.split (. message :content) "\n")
-                   (and 
-                     (. message :function_call) 
-                     (= (-> message (. :function_call) (. :name)) "cell-execution"))
-                   (core.concat 
-                     ["" "```bash"] 
-                     (string.split (-> message (. :function_call) (. :arguments) (. :command)) "\n") ["```" ""])  
-                   (. message :complete)
-                   ["----"] 
-                   ["" "```json" (vim.json.encode message) "```" ""])]
-             (vim.api.nvim_buf_set_lines buf (core.count current-lines) -1 false lines)))
-         :error (fn [_ message] (core.println message))
-         :exit (fn [id message] (core.println "finished" id))}        
-        prompt))
+(defn into-buffer [prompt]
+  (let [lines (string.split prompt "\n")
+        [win buf] (util.open lines)
+        t (util.show-spinner buf (core.inc (core.count lines)))]
+    (nvim.buf_set_lines buf -1 -1 false ["" ""])
+    ;; run Docker AI
+    (run-prompt 
+      (util.uuid) 
+      {:content 
+       (fn [_ message] 
+         (t:stop) 
+         (let [current-lines (vim.api.nvim_buf_get_lines buf 0 -1 true)
+               lines 
+               (if 
+                 (. message :content)
+                 (string.split (. message :content) "\n")
+                 (and 
+                   (. message :function_call) 
+                   (= (-> message (. :function_call) (. :name)) "cell-execution"))
+                 (core.concat 
+                   ["" "```bash"] 
+                   (string.split (-> message (. :function_call) (. :arguments) (. :command)) "\n") ["```" ""])  
+                 (. message :complete)
+                 ["----"] 
+                 ["" "```json" (vim.json.encode message) "```" ""])]
+           (vim.api.nvim_buf_set_lines buf (core.count current-lines) -1 false lines)))
+       :error (fn [_ message] (core.println message))
+       :exit (fn [id message] (core.println "finished" id))}        
+      prompt)))
 
 (defn start []
   (let [cb {:exit (fn [id message]
