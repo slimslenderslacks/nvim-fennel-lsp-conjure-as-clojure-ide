@@ -13,7 +13,7 @@
    :row 3 
    :col 3 
    :width 80 
-   :height 40 
+   :height 35
    :style "minimal"
    :border "rounded" 
    :title "my title"
