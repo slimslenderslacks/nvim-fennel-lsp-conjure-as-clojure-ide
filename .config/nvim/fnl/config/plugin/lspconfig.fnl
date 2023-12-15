@@ -3,7 +3,9 @@
    autoload {nvim aniseed.nvim
              lsp lspconfig
              cmplsp cmp_nvim_lsp
-             os os}})
+             os os
+             core aniseed.core
+             dockerai dockerai}})
 
 ;symbols to show for lsp diagnostics
 (defn define-signs
@@ -96,32 +98,36 @@
                    :handlers handlers
                    :capabilities capabilities})
 
+  ;; Docker AI
+  ;(lsp.docker_ai.setup {:cmd ["docker" "run"
+                              ;"--rm" "--init" "--interactive"
+                              ;"vonwig/labs-assistant-ml:staging"]
+                        ;:on_attach on_attach
+                        ;:handlers handlers
+                        ;:capabilities capabilities})
+
   ;; docker-lsp
   ;; ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
   ;; ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "atomist/lsp"]
   (lsp.docker_lsp.setup {:cmd
                          (if (not (os.getenv "USE_DOCKER"))
-                           (if (not (os.getenv "DOCKER_LSP_NATIVE"))
-                             ["nix"
-                              "run"
-                              "/Users/slim/docker/lsp/#clj"
-                              "--"
-                              "--pod-exe-path" "/Users/slim/.docker/cli-plugins/docker-pod"
-                              "--user" "jimclark106"]
-                             ["docker"
-                              "lsp"
-                              "listen"
-                              "--user" "jimclark106"])
+
+                           ["nix"
+                            "run"
+                            "/Users/slim/docker/lsp/#clj"
+                            "--"
+                            "--pod-exe-path" "/Users/slim/.docker/cli-plugins/docker-pod"]
+
                            ["docker" "run"
                                      "--rm" "--init" "--interactive"
-                                     "-v" "/tmp:/tmp"
-                                     "-v" "/Users/slim:/Users/slim"
+                                     "--mount" "type=volume,source=docker-lsp,target=/docker"
+                                     "--mount" (.. "type=bind,source=" (vim.fn.getcwd) ",target=/project")
                                      "vonwig/lsp"
-                                     "--user" "jimclark106"
-                                     "--pat" "dckr_pat_zPNe318_pOB7i6NgVXD0PGvM6Yo"
-                                     "--workspace" "/Users/slim"])
+                                     "listen"
+                                     "--workspace" "/docker"
+                                     "--root-dir" (vim.fn.getcwd)])
                          :on_attach on_attach
-                         :handlers handlers
+                         :handlers (core.assoc handlers "docker/jwt" dockerai.jwt-handler)
                          :capabilities capabilities})
 
   (lsp.gopls.setup {:cmd ["gopls" "serve"]

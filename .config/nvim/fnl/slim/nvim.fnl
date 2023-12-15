@@ -68,7 +68,27 @@
               (set tokens (core.concat tokens [s])) 
               (vim.api.nvim_buf_set_lines buf (core.inc (core.count lines)) -1 false (str.split (str.join tokens) "\n")))))))))
 
+(defn open-file [path]
+  (let [win (vim.api.nvim_tabpage_get_win 0)]
+    (vim.cmd "vsplit")
+    (vim.cmd (.. "e " path))
+    (let [buf (vim.api.nvim_get_current_buf)]
+      (vim.api.nvim_set_current_win win)
+      buf)))
+
+(defn append [buf lines]
+  (vim.api.nvim_buf_set_lines
+    buf
+    (core.count
+      (vim.api.nvim_buf_get_lines buf 0 -1 false))
+    -1
+    false
+    lines))
+
 (comment
+  ;; test open and append
+  (def buf (open-file "Dockerfile.test"))
+  (append buf ["yo"])
   (let [buf (nvim.create_buf false true)]
     (open-win buf {:title "hey"})
     (show-spinner buf)))
