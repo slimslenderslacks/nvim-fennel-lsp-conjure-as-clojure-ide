@@ -4,7 +4,8 @@
              str aniseed.string
              util slim.nvim
              curl plenary.curl
-             dockerai dockerai}})
+             dockerai dockerai
+             lsps lsps}})
 
 (defn open [lines]
   (let [buf (vim.api.nvim_create_buf false true)]
@@ -57,9 +58,9 @@
 ;; ----------------
 
 (comment
-  (util.lsps-list)
-  (dockerai.start)
-  (dockerai.into-buffer "Summarize this project"))
+  (lsps.list)
+  (dockerai.into-buffer "Summarize this project")
+  (dockerai.into-buffer "Write a compose file with php and mysql server"))
 
 ;; Now integrate Docker AI
 (defn dockerCopilot []
@@ -78,7 +79,7 @@
 
 (comment
   (dockerai.start)
-  (util.lsps-list)
+  (lsps.list)
   (dockerai.stop)
   )
 

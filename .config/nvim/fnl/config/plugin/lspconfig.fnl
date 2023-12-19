@@ -4,8 +4,7 @@
              lsp lspconfig
              cmplsp cmp_nvim_lsp
              os os
-             core aniseed.core
-             dockerai dockerai}})
+             core aniseed.core}})
 
 ;symbols to show for lsp diagnostics
 (defn define-signs
@@ -97,38 +96,6 @@
   (lsp.rnix.setup {:on_attach on_attach
                    :handlers handlers
                    :capabilities capabilities})
-
-  ;; Docker AI
-  ;(lsp.docker_ai.setup {:cmd ["docker" "run"
-                              ;"--rm" "--init" "--interactive"
-                              ;"vonwig/labs-assistant-ml:staging"]
-                        ;:on_attach on_attach
-                        ;:handlers handlers
-                        ;:capabilities capabilities})
-
-  ;; docker-lsp
-  ;; ["java" "-jar" "/Users/slim/atmhq/lsp/target/docker-lsp-0.0.1-standalone.jar"]
-  ;; ["docker" "run" "--rm" "--init" "-i" "-v" "/tmp:/tmp" "atomist/lsp"]
-  (lsp.docker_lsp.setup {:cmd
-                         (if (not (os.getenv "USE_DOCKER"))
-
-                           ["nix"
-                            "run"
-                            "/Users/slim/docker/lsp/#clj"
-                            "--"
-                            "--pod-exe-path" "/Users/slim/.docker/cli-plugins/docker-pod"]
-
-                           ["docker" "run"
-                                     "--rm" "--init" "--interactive"
-                                     "--mount" "type=volume,source=docker-lsp,target=/docker"
-                                     "--mount" (.. "type=bind,source=" (vim.fn.getcwd) ",target=/project")
-                                     "vonwig/lsp"
-                                     "listen"
-                                     "--workspace" "/docker"
-                                     "--root-dir" (vim.fn.getcwd)])
-                         :on_attach on_attach
-                         :handlers (core.assoc handlers "docker/jwt" dockerai.jwt-handler)
-                         :capabilities capabilities})
 
   (lsp.gopls.setup {:cmd ["gopls" "serve"]
                     :filetypes ["go" "gomod"]

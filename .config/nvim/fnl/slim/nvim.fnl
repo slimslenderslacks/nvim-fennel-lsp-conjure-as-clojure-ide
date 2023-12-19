@@ -1,7 +1,13 @@
 (module slim.nvim
   {autoload {nvim aniseed.nvim
              core aniseed.core
-             str aniseed.string}})
+             str aniseed.string
+             lspconfig-util lspconfig.util}})
+
+(defn git-root []
+  (or
+    ((lspconfig-util.root_pattern ".git") (vim.fn.getcwd))
+    (vim.fn.getcwd)))
 
 (defn get-current-buffer-selection []
   (let [[_ s1 e1 _] (nvim.fn.getpos "'<")
@@ -44,9 +50,6 @@
             {:text true})
         obj (p:wait)]
     (str.trim (. obj :stdout))))
-
-(defn lsps-list []
-  (core.map (fn [client] (. client :name)) (vim.lsp.get_active_clients)))
 
 (defn open [lines]
   (let [buf (vim.api.nvim_create_buf false true)]

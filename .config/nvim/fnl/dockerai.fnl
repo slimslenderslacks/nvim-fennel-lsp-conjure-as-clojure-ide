@@ -2,7 +2,8 @@
   {autoload {nvim aniseed.nvim
              core aniseed.core
              string aniseed.string
-             util slim.nvim}})
+             util slim.nvim
+             lsps lsps}})
 
 (vim.lsp.set_log_level "TRACE")
 (def use-nix? true)
@@ -61,46 +62,26 @@
     (core.println "jwt err: " err))
   (jwt))
 
-;; TODO replace this with lspconfig calls
-(defn start-lsps [root-dir prompt-handler exit-handler]
-  (let [docker-ai-lsp
-        (vim.lsp.start {:name "docker_ai"
-                        :cmd ["docker" "run"
-                              "--rm" "--init" "--interactive"
-                              "vonwig/labs-assistant-ml:staging"]
-                        :root_dir (vim.fn.getcwd)
-                        :handlers {"$/prompt" prompt-handler
-                                          "$/exit" exit-handler}})
-        docker-lsp
-        (if use-nix?
-          (vim.lsp.start {:name "docker_lsp"
-                          :cmd ["nix" "run"
-                                "/users/slim/docker/lsp/#clj"
-                                "--"
-                                "--pod-exe-path"
-                                "/Users/slim/.docker/cli-plugins/docker-pod"]
-                          :cmd_env {"DOCKER_LSP" "nix"}
-                          :root_dir (vim.fn.getcwd)
-                          :handlers {"docker/jwt" jwt-handler}})
-          (vim.lsp.start {:name "docker_lsp"
-                          :cmd ["docker" "run"
-                                "--rm" "--init" "--interactive"
-                                "--mount" "type=volume,source=docker-lsp,target=/docker"
-                                "--mount" (.. "type=bind,source=" root-dir ",target=/project")
-                                "vonwig/lsp"
-                                "listen"
-                                "--workspace" "/docker"
-                                "--root-dir" root-dir]
-                          :root_dir (vim.fn.getcwd)
-                          :handlers {"docker/jwt" jwt-handler}}))]
-    [docker-ai-lsp docker-lsp]))
-
-(defn get-client-by-name [s]
-  (core.some (fn [client] (when (= client.name s) client)) (vim.lsp.get_active_clients)) )
+(defn start-lsps [prompt-handler exit-handler]
+  ;; this lsp calls commands but it is never attached to buffers
+  (let [root-dir (util.git-root)
+        extra-handlers {"docker/jwt" jwt-handler}]
+    (vim.lsp.start {:name "docker_ai"
+                    :cmd ["docker" "run"
+                          "--rm" "--init" "--interactive"
+                          "vonwig/labs-assistant-ml:staging"]
+                    :root_dir root-dir
+                    :handlers (core.merge 
+                                {"$/prompt" prompt-handler
+                                 "$/exit" exit-handler}
+                                extra-handlers)})
+    (lsps.start root-dir extra-handlers)))
 
 (defn stop []
-  (vim.lsp.stop_client (. (get-client-by-name "docker_lsp") :id)  false)
-  (vim.lsp.stop_client (. (get-client-by-name "docker_ai") :id) false))
+  (let [docker-lsp (. (lsps.get-client-by-name "docker_lsp") :id)
+        docker-ai (. (lsps.get-client-by-name "docker_ai") :id)]
+    (when docker-lsp (vim.lsp.stop_client docker-lsp  false))
+    (when docker-ai (vim.lsp.stop_client docker-ai false))))
 
 (var registrations {})
 
@@ -108,8 +89,8 @@
   {:fnl/docstring "call Docker AI and register callback for this question identifier"
    :fnl/arglist [question-id callback prompt]}
   (set registrations (core.assoc registrations question-id callback))
-  (let [docker-ai-lsp (get-client-by-name "docker_ai")
-        docker-lsp (get-client-by-name "docker_lsp")]
+  (let [docker-ai-lsp (lsps.get-client-by-name "docker_ai")
+        docker-lsp (lsps.get-client-by-name "docker_lsp")]
     (let [result (docker-ai-lsp.request_sync 
                    "prompt" 
                    (core.merge 
@@ -134,8 +115,8 @@
       (core.println result))))
 
 (defn questions []
-  (let [docker-ai-lsp (get-client-by-name "docker_ai")
-        docker-lsp (get-client-by-name "docker_lsp")]
+  (let [docker-ai-lsp (lsps.get-client-by-name "docker_ai")
+        docker-lsp (lsps.get-client-by-name "docker_lsp")]
     (let [result (. (docker-lsp.request_sync "docker/project-facts" {"vs-machine-id" ""} 60000) :result)]
       (core.concat
         (. result :project/potential-questions)
@@ -157,7 +138,7 @@
                  :endLine end-line 
                  :edit edit 
                  :reason reason}]
-  (let [docker-lsp (get-client-by-name "docker_lsp")
+  (let [docker-lsp (lsps.get-client-by-name "docker_lsp")
         params {:uri {:external (.. "file://" path)} 
                 :message reason 
                 :range 
@@ -264,7 +245,6 @@
             :content (fn [id message]
                        ((. (. registrations id) :content) id message))}]
     (start-lsps
-      (vim.fn.getcwd)
       (prompt-handler cb)
       (exit-handler cb))))
 
@@ -282,11 +262,30 @@
       (nvim.win_set_buf new-win term-buf)
       (nvim.fn.termopen cmd))))
 
+(defn lsp-debug [_]
+  (vim.ui.select
+      ["documents"
+       "project-context"
+       "tracking-data"
+       "login"
+       "alpine-packages"
+       "repositories"
+       "client-settings"] 
+      {:prompt "Select a prompt:"
+       :format (fn [item] (item:gsub "_" " "))}
+      (fn [selected _]
+        (let [client (lsps.get-client-by-name "docker_lsp")]
+          (client.request_sync "docker/debug" {:type selected})))))
+
+(vim.api.nvim_create_user_command "DockerAIStart" start {:desc "Start the LSPs for Docker AI"})
+(vim.api.nvim_create_user_command "DockerAIStop" stop {:desc "Stop the LSPs for Docker AI"})
+(vim.api.nvim_create_user_command "DockerAIDebug" lsp-debug {:desc "Get some state from the Docker LSP"})
+
 (comment
   (def buf (vim.api.nvim_create_buf true true))
   
   (start) 
-  (util.lsps-list)
+  (lsps.list)
   (stop)
 
   (run-prompt "18" (callback buf) "Can you write a Dockerfile for this project?")
