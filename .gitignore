@@ -1,2 +1,4 @@
 .config/nvim/lua
 /.config/nvim/plugin/
+/.clj-kondo/
+/.lsp/
