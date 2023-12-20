@@ -47,6 +47,11 @@
   ;; lsp
   :slimslenderslacks/nvim-lspconfig {:mod :lspconfig}
 
+  ;;
+  :slimslenderslacks/nvim-docker-ai {:requires [:slimslenderslacks/nvim-lspconfig
+                                                :Olical/aniseed
+                                                :nvim-lua/plenary.nvim]}
+
   ; snippets
   :L3MON4D3/LuaSnip {:requires [:saadparwaiz1/cmp_luasnip]}
 
