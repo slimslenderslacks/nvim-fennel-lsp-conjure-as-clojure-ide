@@ -1,6 +1,5 @@
 (module config.plugin.lspconfig
-  {require {custom config.custom}
-   autoload {nvim aniseed.nvim
+  {autoload {nvim aniseed.nvim
              lsp lspconfig
              cmplsp cmp_nvim_lsp
              os os
@@ -80,6 +79,9 @@
                        :handlers handlers
                        :capabilities capabilities})
 
+  (lsp.pyright.setup {:on_attach on_attach
+                       :handlers handlers
+                       :capabilities capabilities})
 
   ;; dockerfiles
   ;(lsp.dockerls.setup {:cmd  ["npx" "run" "/Users/slim/slimslenderslacks/dockerfile-language-server-nodejs/out/src/server.js" "--stdio"]
