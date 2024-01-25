@@ -8,7 +8,8 @@
    :conjure "conj"
    :nvim_lsp "lsp"
    :vsnip "vsnp"
-   :luasnip "lsnp"})
+   :luasnip "lsnp"
+   :lsp-inline-completions "inline"})
 
 (def- cmp-srcs
   [{:name :nvim_lsp}
@@ -16,7 +17,8 @@
    {:name :conjure}
    ;;{:name :buffer}
    {:name :vsnip}
-   {:name :luasnip}])
+   {:name :luasnip}
+   {:name :lsp-inline-completions}])
 
 ;; Setup cmp with desired settings
 
@@ -52,4 +54,5 @@
                                             {1 :i 2 :s})}
             :snippet {:expand (fn [args]
                                 (luasnip.lsp_expand args.body))}
-            :sources cmp-srcs})
+            :sources cmp-srcs
+            :experimental {:ghost_text true}})

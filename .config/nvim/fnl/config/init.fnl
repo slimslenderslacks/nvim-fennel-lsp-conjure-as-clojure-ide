@@ -80,7 +80,7 @@
   (each [option value (pairs options)]
     (core.assoc nvim.o option value)))
 
-;import plugin.fnl
-(require :config.plugin)
 (require :snippets)
-
+(require :config.plugin.cmp)
+(require :config.plugin.telescope)
+(require :config.plugin.lspconfig)
