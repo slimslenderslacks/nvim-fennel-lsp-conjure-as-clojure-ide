@@ -18,7 +18,7 @@
    ;;{:name :buffer}
    {:name :vsnip}
    {:name :luasnip}
-   {:name :lsp-inline-completions}])
+   {:name :lsp-inline-completions :keyword_length 2}])
 
 ;; Setup cmp with desired settings
 
